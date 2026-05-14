@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>账号监控池分析工具</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">账号监控池分析工具 · 半自动监控工作台</p>
+            <h1>账号池读取，今日任务，观察入库，日报生成</h1>
+          </div>
+          <button class="ghost-button" id="refreshAllButton" type="button">刷新全部数据</button>
+        </header>
+
+        <nav class="section-nav" aria-label="工具入口">
+          <a href="#accountPool">账号监控池</a>
+          <a href="#todayTasks">今日监控任务</a>
+          <a href="#observationFormPanel">今日观察记录</a>
+          <a href="#viralQueue">爆款拆解池</a>
+          <a href="#dailyReport">每日监控日报</a>
+          <a href="#publicSources">公开信息源</a>
+          <a href="#aiNews">AI最新消息</a>
+          <a href="#hotMaterials">热点素材</a>
+          <a href="#aiDailyBrief">每日AI简报</a>
+        </nav>
+
+        <section class="panel input-panel" id="accountPool" aria-labelledby="form-title">
+          <div class="panel-head">
+            <h2 id="form-title">账号信息</h2>
+            <p>先手动录入关键线索；当前版本不抓取平台链接。</p>
+          </div>
+
+          <form id="accountForm">
+            <div class="form-grid">
+              <label>
+                <span>平台 *</span>
+                <input name="platform" required placeholder="抖音 / 小红书 / 视频号 / B站" />
+              </label>
+
+              <label>
+                <span>账号名称 *</span>
+                <input name="accountName" required placeholder="账号昵称" />
+              </label>
+
+              <label class="wide">
+                <span>账号链接</span>
+                <input name="accountUrl" placeholder="复制账号主页链接" />
+              </label>
+
+              <label class="wide">
+                <span>代表爆款链接</span>
+                <input name="hotVideoUrl" placeholder="复制一条代表视频链接" />
+              </label>
+
+              <p class="field-hint wide">账号链接或代表爆款链接至少填写一个。</p>
+
+              <label class="wide">
+                <span>代表爆款数据</span>
+                <input name="hotVideoData" placeholder="例如：播放 38w，点赞 1.2w，评论 860，私信引导明显" />
+              </label>
+
+              <label class="wide">
+                <span>视频标题</span>
+                <input name="videoTitle" placeholder="代表视频标题或开头一句" />
+              </label>
+
+              <label class="wide">
+                <span>视频文案或转写稿</span>
+                <textarea name="videoScript" rows="7" placeholder="粘贴口播稿、字幕、转写稿或你手动整理的结构"></textarea>
+              </label>
+
+              <label class="wide">
+                <span>主页简介</span>
+                <textarea name="profileBio" rows="4" placeholder="账号主页简介、橱窗、直播、私信、课程等线索"></textarea>
+              </label>
+
+              <label class="wide">
+                <span>截图路径或备注</span>
+                <textarea name="screenshotNote" rows="3" placeholder="本地截图路径，或补充你看到的评论区、直播间、橱窗信息"></textarea>
+              </label>
+
+              <fieldset class="learning-field wide">
+                <legend>适合学习什么</legend>
+                <div class="checkbox-grid">
+                  <label class="check-item"><input type="checkbox" name="learningOptions" value="标题" />标题</label>
+                  <label class="check-item"><input type="checkbox" name="learningOptions" value="前3秒钩子" />前3秒钩子</label>
+                  <label class="check-item"><input type="checkbox" name="learningOptions" value="口播节奏" />口播节奏</label>
+                  <label class="check-item"><input type="checkbox" name="learningOptions" value="案例拆解" />案例拆解</label>
+                  <label class="check-item"><input type="checkbox" name="learningOptions" value="教程演示" />教程演示</label>
+                  <label class="check-item"><input type="checkbox" name="learningOptions" value="私信转化" />私信转化</label>
+                  <label class="check-item"><input type="checkbox" name="learningOptions" value="直播承接" />直播承接</label>
+                  <label class="check-item"><input type="checkbox" name="learningOptions" value="人设表达" />人设表达</label>
+                </div>
+              </fieldset>
+            </div>
+
+            <div class="actions">
+              <button type="button" class="ghost-button" id="fillTestButton">填充测试数据</button>
+              <button type="submit" class="primary-button">生成分析预览</button>
+              <button type="button" class="secondary-button" id="confirmSaveButton" disabled>确认入库</button>
+              <button type="reset" class="ghost-button">清空</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="panel result-panel" aria-live="polite">
+          <div class="panel-head">
+            <h2>分析结果预览</h2>
+            <p id="saveStatus">等待录入</p>
+          </div>
+          <div id="resultEmpty" class="empty-state">填入账号信息后，先生成分析预览，确认无误后再入库。</div>
+          <div id="resultContent" class="result-content hidden"></div>
+        </section>
+
+        <section class="panel preview-panel">
+          <div class="panel-head">
+            <h2>账号监控池</h2>
+            <p id="previewPath">data/monitoring/account_monitor_pool.csv</p>
+          </div>
+          <div id="csvPreview" class="table-wrap">暂无数据</div>
+        </section>
+
+        <section class="panel preview-panel" id="todayTasks">
+          <div class="panel-head split-head">
+            <div>
+              <h2>今日监控任务</h2>
+              <p id="taskStatus">读取账号监控池后，按 A重点 > B观察 > C备用 生成今日建议查看账号。</p>
+            </div>
+            <button class="primary-button" id="generateTasksButton" type="button">生成今日监控任务</button>
+          </div>
+          <div id="taskTable" class="table-wrap">暂无任务</div>
+        </section>
+
+        <section class="panel preview-panel" id="observationFormPanel">
+          <div class="panel-head">
+            <h2>今日观察数据补充</h2>
+            <p id="selectedTaskStatus">请先在“今日监控任务”中选择一个账号。</p>
+          </div>
+
+          <form id="observationForm">
+            <div class="form-grid">
+              <label>
+                <span>平台</span>
+                <input name="taskPlatform" readonly placeholder="从任务带入" />
+              </label>
+              <label>
+                <span>账号名称</span>
+                <input name="taskAccountName" readonly placeholder="从任务带入" />
+              </label>
+
+              <label class="wide">
+                <span>今日发现视频链接</span>
+                <input name="videoUrl" placeholder="打开账号或视频后，粘贴今天发现的视频链接" />
+              </label>
+
+              <label class="wide">
+                <span>视频标题</span>
+                <input name="videoTitle" placeholder="视频标题或开头一句" />
+              </label>
+
+              <label>
+                <span>播放</span>
+                <input name="playCount" placeholder="例如：12w" />
+              </label>
+              <label>
+                <span>点赞</span>
+                <input name="likeCount" placeholder="例如：8300" />
+              </label>
+              <label>
+                <span>评论</span>
+                <input name="commentCount" placeholder="例如：526" />
+              </label>
+              <label>
+                <span>收藏</span>
+                <input name="favoriteCount" placeholder="例如：1400" />
+              </label>
+              <label>
+                <span>转发</span>
+                <input name="shareCount" placeholder="例如：300" />
+              </label>
+
+              <label class="wide">
+                <span>视频文案或转写稿</span>
+                <textarea name="videoScript" rows="6" placeholder="粘贴字幕、口播文案、转写稿或你整理的结构"></textarea>
+              </label>
+
+              <label class="wide">
+                <span>截图路径</span>
+                <input name="screenshotPath" placeholder="例如：E:\\素材\\监控截图\\2026-05-14-账号名.png" />
+              </label>
+
+              <fieldset class="learning-field wide">
+                <legend>是否发现变现痕迹</legend>
+                <div class="checkbox-grid">
+                  <label class="check-item"><input type="checkbox" name="monetizationTraces" value="直播承接" />直播承接</label>
+                  <label class="check-item"><input type="checkbox" name="monetizationTraces" value="私信转化" />私信转化</label>
+                  <label class="check-item"><input type="checkbox" name="monetizationTraces" value="课程" />课程</label>
+                  <label class="check-item"><input type="checkbox" name="monetizationTraces" value="工具" />工具</label>
+                  <label class="check-item"><input type="checkbox" name="monetizationTraces" value="社群" />社群</label>
+                </div>
+              </fieldset>
+
+              <label class="wide">
+                <span>我的主观备注</span>
+                <textarea name="notes" rows="4" placeholder="补充评论区反馈、你觉得值得拆的原因、平台风向、风险点等"></textarea>
+              </label>
+            </div>
+
+            <div class="actions">
+              <button type="submit" class="primary-button" id="saveObservationButton" disabled>保存今日观察记录</button>
+              <button type="reset" class="ghost-button">清空观察表单</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="panel preview-panel" id="dailyRecords">
+          <div class="panel-head split-head">
+            <div>
+              <h2>今日观察记录</h2>
+              <p id="recordPath">data/monitoring/daily_monitor_records.csv</p>
+            </div>
+            <button class="ghost-button" id="loadRecordsButton" type="button">刷新观察记录</button>
+          </div>
+          <div id="recordTable" class="table-wrap">暂无记录</div>
+        </section>
+
+        <section class="panel preview-panel" id="viralQueue">
+          <div class="panel-head split-head">
+            <div>
+              <h2>爆款拆解池</h2>
+              <p id="queuePath">data/monitoring/viral_analysis_queue.csv</p>
+            </div>
+            <button class="ghost-button" id="loadQueueButton" type="button">刷新拆解池</button>
+          </div>
+          <div id="queueTable" class="table-wrap">暂无待拆解视频</div>
+        </section>
+
+        <section class="panel preview-panel" id="dailyReport">
+          <div class="panel-head split-head">
+            <div>
+              <h2>每日监控日报</h2>
+              <p id="reportPath">outputs/daily_monitor_report_YYYY-MM-DD.md</p>
+            </div>
+            <button class="primary-button" id="generateReportButton" type="button">生成/刷新日报</button>
+          </div>
+          <pre id="reportPreview" class="report-preview">暂无日报</pre>
+        </section>
+
+        <section class="panel preview-panel" id="publicSources">
+          <div class="panel-head split-head">
+            <div>
+              <h2>公开信息源</h2>
+              <p id="publicSourceStatus">只读取配置文件中 enabled=true 的公开 RSS/公开网页。</p>
+            </div>
+            <button class="primary-button" id="collectPublicSourcesButton" type="button">读取公开信息源</button>
+          </div>
+          <div class="table-wrap">
+            <p class="field-hint">配置文件：data/sources/public_ai_sources.json</p>
+            <p class="field-hint">配置文件：data/sources/public_hot_material_sources.json</p>
+          </div>
+        </section>
+
+        <section class="panel preview-panel" id="aiNews">
+          <div class="panel-head split-head">
+            <div>
+              <h2>AI最新消息</h2>
+              <p id="aiNewsPath">data/daily/ai_news_YYYY-MM-DD.csv</p>
+            </div>
+            <button class="ghost-button" id="loadAiNewsButton" type="button">刷新AI消息</button>
+          </div>
+          <div id="aiNewsTable" class="table-wrap">暂无AI消息</div>
+        </section>
+
+        <section class="panel preview-panel" id="hotMaterials">
+          <div class="panel-head split-head">
+            <div>
+              <h2>热点素材</h2>
+              <p id="hotMaterialsPath">data/daily/hot_materials_YYYY-MM-DD.csv</p>
+            </div>
+            <button class="ghost-button" id="loadHotMaterialsButton" type="button">刷新热点素材</button>
+          </div>
+          <div id="hotMaterialsTable" class="table-wrap">暂无热点素材</div>
+        </section>
+
+        <section class="panel preview-panel" id="aiDailyBrief">
+          <div class="panel-head split-head">
+            <div>
+              <h2>每日AI简报</h2>
+              <p id="aiBriefPath">outputs/ai_daily_brief_YYYY-MM-DD.md</p>
+            </div>
+            <button class="ghost-button" id="loadAiBriefButton" type="button">刷新AI简报</button>
+          </div>
+          <pre id="aiBriefPreview" class="report-preview">暂无每日AI简报</pre>
+        </section>
+      </section>
+    </main>
+    <script src="/app.js"></script>
+  </body>
+</html>

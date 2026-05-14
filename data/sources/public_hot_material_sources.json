@@ -1,0 +1,42 @@
+[
+  {
+    "source_name": "TechCrunch Startups",
+    "source_type": "RSS",
+    "url": "https://techcrunch.com/category/startups/feed/",
+    "category": "创业知识付费",
+    "enabled": true,
+    "note": "公开 RSS，用于观察创业、产品、融资和商业化热点。"
+  },
+  {
+    "source_name": "Social Media Examiner",
+    "source_type": "RSS",
+    "url": "https://www.socialmediaexaminer.com/feed/",
+    "category": "自媒体运营",
+    "enabled": true,
+    "note": "公开 RSS，用于观察内容营销、社媒运营和短视频方法。"
+  },
+  {
+    "source_name": "Google Trends Daily US",
+    "source_type": "RSS",
+    "url": "https://trends.google.com/trending/rss?geo=US",
+    "category": "AI新闻",
+    "enabled": true,
+    "note": "公开 RSS，用于借势社会热点；如无法访问，会在日报中提示更换来源。"
+  },
+  {
+    "source_name": "Google AI Blog Hot Material",
+    "source_type": "public_page",
+    "url": "https://blog.google/technology/ai/",
+    "category": "AI工具",
+    "enabled": true,
+    "note": "Google 官方公开 AI 页面，可作为 AI 产品和工具变化的热点素材来源。"
+  },
+  {
+    "source_name": "手动补充热点来源",
+    "source_type": "RSS",
+    "url": "",
+    "category": "自媒体运营",
+    "enabled": false,
+    "note": "后续可把你认可的公开热点 RSS 或公开网页填在这里，并改为 enabled=true。"
+  }
+]

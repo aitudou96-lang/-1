@@ -1,0 +1,13 @@
+{
+  "name": "account-monitor-pool-tool",
+  "version": "0.1.0",
+  "private": true,
+  "description": "账号监控池分析工具 MVP",
+  "scripts": {
+    "start": "node server.js",
+    "collect:daily": "node scripts/collectDaily.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -1,0 +1,42 @@
+[
+  {
+    "source_name": "OpenAI News",
+    "source_type": "RSS",
+    "url": "https://openai.com/news/rss.xml",
+    "category": "AI产品发布",
+    "enabled": true,
+    "note": "OpenAI 官方公开 RSS，用于产品、模型、研究和公告动态。"
+  },
+  {
+    "source_name": "Hugging Face Blog",
+    "source_type": "RSS",
+    "url": "https://huggingface.co/blog/feed.xml",
+    "category": "AI工具",
+    "enabled": true,
+    "note": "Hugging Face 公开博客 RSS，用于模型、工具、开源生态更新。"
+  },
+  {
+    "source_name": "TechCrunch AI",
+    "source_type": "RSS",
+    "url": "https://techcrunch.com/category/artificial-intelligence/feed/",
+    "category": "AI新闻",
+    "enabled": true,
+    "note": "公开科技媒体 RSS，用于 AI 新闻和商业化动态。"
+  },
+  {
+    "source_name": "Google AI Blog",
+    "source_type": "public_page",
+    "url": "https://blog.google/technology/ai/",
+    "category": "AI产品发布",
+    "enabled": true,
+    "note": "Google 官方公开 AI 页面；若页面结构变化导致读取失败，会在日报中提示。"
+  },
+  {
+    "source_name": "手动补充AI来源",
+    "source_type": "RSS",
+    "url": "",
+    "category": "AI新闻",
+    "enabled": false,
+    "note": "后续可把你认可的公开 RSS 或公开网页填在这里，并改为 enabled=true。"
+  }
+]
