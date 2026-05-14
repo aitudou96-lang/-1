@@ -289,7 +289,7 @@ async function loadAiNews() {
   renderTable(
     aiNewsTable,
     data.rows,
-    ["日期", "来源", "标题", "摘要", "关键词", "与AI先锋相关度", "与AI先锋者相关度", "是否适合做内容", "建议切入角度", "风险备注", "链接"],
+    ["日期", "来源", "标题", "相关等级", "可拍标题", "前3秒钩子", "适合账号", "建议内容类型", "是否适合承接799元AI口播智能体", "承接方式", "产品连接句", "不适合承接原因", "下一步动作", "一句话拍摄建议", "判断原因", "风险备注", "链接"],
     "暂无AI消息，请先读取公开信息源。"
   );
 }
@@ -300,7 +300,7 @@ async function loadHotMaterials() {
   renderTable(
     hotMaterialsTable,
     data.rows,
-    ["日期", "热点名称", "来源", "热点类型", "热度判断", "可延展方向", "适合AI先锋还是AI先锋者", "适合流量/信任/转化", "可做视频角度", "风险备注"],
+    ["日期", "热点名称", "来源", "热点类型", "相关等级", "可拍视频标题", "前3秒钩子建议", "适合账号", "内容用途", "是否适合承接799元AI口播智能体", "承接方式", "产品连接句", "不适合承接原因", "下一步动作", "一句话拍摄建议", "不建议做的原因", "风险备注", "链接"],
     "暂无热点素材，请先读取公开信息源。"
   );
 }
@@ -317,20 +317,23 @@ async function collectPublicSources() {
 
   try {
     const data = await postJson("/api/public-sources/collect", {});
-    publicSourceStatus.textContent = `读取完成：AI消息 ${data.aiRows.length} 条，热点素材 ${data.hotRows.length} 条，失败来源 ${data.failures.length} 个。`;
+    const lockNotice = data.fileWriteWarnings?.length
+      ? ` 有 ${data.fileWriteWarnings.length} 个 CSV 原目标被占用，已自动写入备用文件。`
+      : "";
+    publicSourceStatus.textContent = `读取完成：AI消息 ${data.aiRows.length} 条，热点素材 ${data.hotRows.length} 条，失败来源 ${data.failures.length} 个。来源健康表：${data.sourceHealthPath}。${lockNotice}`;
     aiNewsPath.textContent = data.aiNewsPath;
     hotMaterialsPath.textContent = data.hotMaterialsPath;
     aiBriefPath.textContent = data.briefPath;
     renderTable(
       aiNewsTable,
       data.aiRows.slice().reverse(),
-      ["日期", "来源", "标题", "摘要", "关键词", "与AI先锋相关度", "与AI先锋者相关度", "是否适合做内容", "建议切入角度", "风险备注", "链接"],
+      ["日期", "来源", "标题", "相关等级", "可拍标题", "前3秒钩子", "适合账号", "建议内容类型", "是否适合承接799元AI口播智能体", "承接方式", "产品连接句", "不适合承接原因", "下一步动作", "一句话拍摄建议", "判断原因", "风险备注", "链接"],
       "暂无AI消息"
     );
     renderTable(
       hotMaterialsTable,
       data.hotRows.slice().reverse(),
-      ["日期", "热点名称", "来源", "热点类型", "热度判断", "可延展方向", "适合AI先锋还是AI先锋者", "适合流量/信任/转化", "可做视频角度", "风险备注"],
+      ["日期", "热点名称", "来源", "热点类型", "相关等级", "可拍视频标题", "前3秒钩子建议", "适合账号", "内容用途", "是否适合承接799元AI口播智能体", "承接方式", "产品连接句", "不适合承接原因", "下一步动作", "一句话拍摄建议", "不建议做的原因", "风险备注", "链接"],
       "暂无热点素材"
     );
     aiBriefPreview.textContent = data.brief || "暂无每日AI简报";

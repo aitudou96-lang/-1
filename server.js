@@ -15,7 +15,8 @@ const {
 const {
   collectDailyPublicSources,
   AI_NEWS_HEADERS,
-  HOT_MATERIAL_HEADERS
+  HOT_MATERIAL_HEADERS,
+  SOURCE_HEALTH_HEADERS
 } = require("./src/publicSourceCollector");
 
 const PORT = Number(process.env.PORT || 4173);
@@ -254,10 +255,13 @@ const server = http.createServer(async (req, res) => {
         date: result.date,
         aiNewsPath: relativePath(result.aiNewsPath),
         hotMaterialsPath: relativePath(result.hotMaterialsPath),
+        sourceHealthPath: relativePath(result.sourceHealthPath),
         briefPath: relativePath(result.briefPath),
         aiRows: result.aiRows,
         hotRows: result.hotRows,
+        sourceHealthRows: result.sourceHealthRows,
         failures: result.failures,
+        fileWriteWarnings: result.fileWriteWarnings,
         brief: result.brief
       });
       return;
@@ -299,6 +303,18 @@ const server = http.createServer(async (req, res) => {
       sendJson(res, 200, {
         path: relativePath(filePath),
         brief
+      });
+      return;
+    }
+
+    if (req.method === "GET" && pathname === "/api/public-sources/source-health") {
+      const dateText = requestUrl.searchParams.get("date") || todayString();
+      const filePath = path.join(DAILY_DIR, `source_health_${dateText}.csv`);
+      const store = createCsvStore(filePath, SOURCE_HEALTH_HEADERS);
+      const preview = await store.preview(100);
+      sendJson(res, 200, {
+        path: relativePath(filePath),
+        ...preview
       });
       return;
     }
